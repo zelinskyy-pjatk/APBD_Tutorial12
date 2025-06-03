@@ -9,5 +9,5 @@ public interface ITripService
     
     Task DeleteClientAsync(int clientId, CancellationToken cancellationToken = default);
     
-    Task AssignClientAsync(int idTrip, AssignClientRequest assignClientRequest, CancellationToken cancellationToken = default);
+    Task AssignClientAsync(int idTrip, AssignClientRequest assignClientRequest, DateTime now, CancellationToken cancellationToken = default);
 }

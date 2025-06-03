@@ -1,6 +1,47 @@
 @Tutorial12_HostAddress = http://localhost:5228
 
-GET {{Tutorial12_HostAddress}}/weatherforecast/
+### Get trips (default paging)
+GET {{Tutorial12_HostAddress}}/api/trips
 Accept: application/json
 
 ###
+
+### Get trips (page 2, 5 items per page)
+GET {{Tutorial12_HostAddress}}/api/trips?page=2&pageSize=5
+Accept: application/json
+
+###
+
+### Register a new client to a trip (change trip ID)
+POST {{Tutorial12_HostAddress}}/api/trips/1/clients
+Content-Type: application/json
+
+{
+  "FirstName": "Anna",
+  "LastName": "Kowalska",
+  "Email": "anna.kowalska@example.com",
+  "Telephone": "+48 123 456 789",
+  "Pesel": "90120212345",
+  "PaymentDate": "2025-07-01"
+}
+
+###
+
+### Register the SAME client again to the same trip (should fail)
+POST {{Tutorial12_HostAddress}}/api/trips/1/clients
+Content-Type: application/json
+
+{
+  "FirstName": "Anna",
+  "LastName": "Kowalska",
+  "Email": "anna.k@example.com",
+  "Telephone": "+48 999 999 999",
+  "Pesel": "90120212345",
+  "PaymentDate": "2025-07-01"
+}
+
+###
+
+### Delete a client (change ID)
+DELETE {{Tutorial12_HostAddress}}/api/clients/123
+Accept: application/json

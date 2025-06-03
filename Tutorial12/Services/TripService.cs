@@ -34,13 +34,14 @@ public class TripService : ITripService
     }
 
     public async Task AssignClientAsync(int idTrip, AssignClientRequest assignClientRequest,
+        DateTime now,
         CancellationToken cancellationToken = default)
     {
         var trip = await _context.Trips.Include(t => t.ClientTrips)
             .SingleOrDefaultAsync(t => t.IdTrip == idTrip, cancellationToken)
             ?? throw new KeyNotFoundException("Trip was not found.");
 
-        if (trip.DateFrom <= DateTime.Now.Date)
+        if (trip.DateFrom <= now)
             throw new InvalidOperationException("Cannot register for a trip that has already started.");
         
         var client = await _context.Clients.SingleOrDefaultAsync(c => c.Pesel == assignClientRequest.Pesel, cancellationToken);
@@ -70,7 +71,7 @@ public class TripService : ITripService
         {
             IdTrip = idTrip,
             IdClient = client.IdClient,
-            RegisteredAt = DateTime.Now,
+            RegisteredAt = now,
             PaymentDate = assignClientRequest.PaymentDate
         });
         
