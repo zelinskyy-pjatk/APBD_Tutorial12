@@ -12,23 +12,28 @@ public class TripsController : ControllerBase
     public TripsController(ITripService tripService) => _tripService = tripService;
 
     [HttpGet]
-    public async Task<ActionResult<TripDto>> GetTripsAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 10,
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetTripsAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         if (page < 1) return BadRequest("Page must be  >= 1");
         if (pageSize < 1) return BadRequest("Page size must be >= 1");
         
-        var result = await _tripService.GetTripsPageAsync(page, pageSize, cancellationToken);
+        var result = await _tripService.GetTripsPageAsync(page, pageSize);
         return Ok(result);
     }
 
-    [HttpPost("{idTrip:int}/clients")]
+    [HttpPost("{idTrip}/clients")]
     public async Task<IActionResult> AssignClient(int idTrip,
-        [FromBody] AssignClientRequest assignClientRequest,
-        CancellationToken cancellationToken)
+        [FromBody] AssignClientRequest assignClientRequest)
     {
-        await _tripService.AssignClientAsync(idTrip, assignClientRequest, DateTime.UtcNow, cancellationToken);
-        return Created();
+        try
+        {
+            await _tripService.AssignClientAsync(idTrip, assignClientRequest, DateTime.UtcNow);
+            return Created();
+        } catch (InvalidOperationException ex)
+        { return BadRequest(ex.Message); } 
+        catch (ArgumentException ex)
+        { return NotFound(ex.Message); } 
+        catch (Exception ex)
+        {  return BadRequest(ex.Message); }
     }
-    
 }

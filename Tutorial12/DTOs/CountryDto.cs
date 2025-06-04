@@ -1,3 +1,13 @@
 ﻿namespace Tutorial12.DTOs;
 
-public record CountryDto(string Name);
+public class CountryDto
+{
+    public string Name { get; set; }
+
+    public CountryDto() { }
+
+    public CountryDto(string name)
+    {
+        Name = name;
+    }
+}

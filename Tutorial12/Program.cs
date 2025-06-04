@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Tutorial12.Data;
+using Tutorial12.Repositories;
 using Tutorial12.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,7 @@ builder.Services.AddDbContext<TravelDbContext>(
             builder.Configuration.GetConnectionString("Default")
             )
         );
+builder.Services.AddScoped<ITripRepository, TripRepository>();
 builder.Services.AddScoped<ITripService, TripService>();
 builder.Services.AddControllers();
 

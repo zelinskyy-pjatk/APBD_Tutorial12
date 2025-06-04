@@ -11,11 +11,11 @@ public class ClientsController : ControllerBase
     public ClientsController(ITripService tripService) => _tripService = tripService;
 
     [HttpDelete("{idClient::int}")]
-    public async Task<IActionResult> DeleteClient(int idClient, CancellationToken cancellationToken)
+    public async Task<IActionResult> DeleteClient(int idClient)
     {
         try
         {
-            await _tripService.DeleteClientAsync(idClient, cancellationToken);
+            await _tripService.DeleteClientAsync(idClient);
             return NoContent();
         }
         catch (InvalidOperationException e)

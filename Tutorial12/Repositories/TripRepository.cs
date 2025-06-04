@@ -10,16 +10,16 @@ public class TripRepository : ITripRepository
     private readonly TravelDbContext _context;
     public TripRepository(TravelDbContext context) => _context = context;
     
-    public async Task<(IReadOnlyList<TripDto> Trips, int Total)> GetTripsAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<(List<TripDto> Trips, int Total)> GetTripsAsync(int page, int pageSize)
     {
         var baseQuery = _context.Trips
                 .AsNoTracking()
-                .Include(t => t.IdCountries)
-                    .ThenInclude(ct => ct.IdCountry)
+                .Include(t => t.CountryTrips)
+                    .ThenInclude(tc => tc.Country)
                 .Include(t => t.ClientTrips)
                     .ThenInclude(ct => ct.IdClientNavigation);
         
-        var total = await baseQuery.CountAsync(cancellationToken);
+        var total = await baseQuery.CountAsync();
             
         var trips = await baseQuery
             .OrderByDescending(t => t.DateFrom)
@@ -31,15 +31,15 @@ public class TripRepository : ITripRepository
                     t.DateFrom,
                     t.DateTo,
                     t.MaxPeople,
-                    t.IdCountries
-                        .Select(ct => new CountryDto(ct.Name))
-                        .ToList(),
+                    t.CountryTrips
+                        .Select(ct => new CountryDto(ct.Country.Name))
+                        .ToList(), 
                     t.ClientTrips
-                        .Select(ct => new ClientDto(
-                            ct.IdClientNavigation.FirstName,
-                            ct.IdClientNavigation.LastName))
+                            .Select(ct => new ClientDto(
+                                ct.IdClientNavigation.FirstName,
+                                ct.IdClientNavigation.LastName))
                         .ToList()))
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
         return (trips, total);
     }
 }

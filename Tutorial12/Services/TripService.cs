@@ -13,38 +13,37 @@ public class TripService : ITripService
     
     public TripService(ITripRepository tripRepository, TravelDbContext context) => (_tripRepository, _context) = (tripRepository, context);
     
-    public async Task<TripPageDto> GetTripsPageAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<TripPageDto> GetTripsPageAsync(int page, int pageSize)
     {
-        var (trips, total) = await _tripRepository.GetTripsAsync(page, pageSize, cancellationToken);
+        var (trips, total) = await _tripRepository.GetTripsAsync(page, pageSize);
         var allPages = (int)Math.Ceiling(total / (double)pageSize);
 
         return new TripPageDto(page, pageSize, allPages, trips);
     }
 
-    public async Task DeleteClientAsync(int clientId, CancellationToken cancellationToken = default)
+    public async Task DeleteClientAsync(int clientId)
     {
-        var hasTrips = await _context.ClientTrips.AnyAsync(x => x.IdClient == clientId, cancellationToken);
+        var hasTrips = await _context.ClientTrips.AnyAsync(x => x.IdClient == clientId);
         
         if (hasTrips) throw new InvalidOperationException("Client is assigned to at least one trip.");
         
-        var client = await _context.Clients.FindAsync(new object?[] {clientId}, cancellationToken) ?? throw new KeyNotFoundException("Client was not found.");
+        var client = await _context.Clients.FindAsync(new object?[] {clientId}) ?? throw new KeyNotFoundException("Client was not found.");
         
         _context.Clients.Remove(client);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync();
     }
 
     public async Task AssignClientAsync(int idTrip, AssignClientRequest assignClientRequest,
-        DateTime now,
-        CancellationToken cancellationToken = default)
+        DateTime now)
     {
         var trip = await _context.Trips.Include(t => t.ClientTrips)
-            .SingleOrDefaultAsync(t => t.IdTrip == idTrip, cancellationToken)
+            .SingleOrDefaultAsync(t => t.IdTrip == idTrip)
             ?? throw new KeyNotFoundException("Trip was not found.");
 
         if (trip.DateFrom <= now)
             throw new InvalidOperationException("Cannot register for a trip that has already started.");
         
-        var client = await _context.Clients.SingleOrDefaultAsync(c => c.Pesel == assignClientRequest.Pesel, cancellationToken);
+        var client = await _context.Clients.SingleOrDefaultAsync(c => c.Pesel == assignClientRequest.Pesel);
 
         if (client is null)
         {
@@ -57,7 +56,7 @@ public class TripService : ITripService
                 Pesel = assignClientRequest.Pesel
             };
             _context.Clients.Add(client);
-            await _context.SaveChangesAsync(cancellationToken);
+            await _context.SaveChangesAsync();
         } else
         {
             var isAlreadyOnTrip = await _context.ClientTrips.AnyAsync(ct => ct.IdTrip == idTrip &&
@@ -66,7 +65,11 @@ public class TripService : ITripService
             if (isAlreadyOnTrip)
                 throw new InvalidOperationException("Client already registered for this trip.");
         }
-
+        
+        var currentClientCount = await _context.ClientTrips.CountAsync(ct => ct.IdTrip == idTrip);
+        if (currentClientCount >= trip.MaxPeople)
+            throw new InvalidOperationException("Trip is already full.");
+        
         _context.ClientTrips.Add(new ClientTrip
         {
             IdTrip = idTrip,
@@ -75,6 +78,6 @@ public class TripService : ITripService
             PaymentDate = assignClientRequest.PaymentDate
         });
         
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync();
     }
 }

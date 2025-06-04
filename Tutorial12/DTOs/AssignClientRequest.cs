@@ -1,10 +1,11 @@
 ﻿namespace Tutorial12.DTOs;
 
-public record AssignClientRequest(
-    string FirstName, 
-    string LastName,
-    string Email,
-    string Telephone, 
-    string Pesel,
-    DateTime? PaymentDate
-);
+public class AssignClientRequest
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Email { get; set; }
+    public string Telephone { get; set; }
+    public string Pesel { get; set; }
+    public DateTime? PaymentDate { get; set; }
+}

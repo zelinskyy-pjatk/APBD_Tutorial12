@@ -4,10 +4,9 @@ namespace Tutorial12.Services;
 
 public interface ITripService
 {
-    Task<TripPageDto> GetTripsPageAsync(
-        int page, int pageSize, CancellationToken cancellationToken = default);
+    Task<TripPageDto> GetTripsPageAsync(int page, int pageSize);
     
-    Task DeleteClientAsync(int clientId, CancellationToken cancellationToken = default);
+    Task DeleteClientAsync(int clientId);
     
-    Task AssignClientAsync(int idTrip, AssignClientRequest assignClientRequest, DateTime now, CancellationToken cancellationToken = default);
+    Task AssignClientAsync(int idTrip, AssignClientRequest assignClientRequest, DateTime now);
 }
