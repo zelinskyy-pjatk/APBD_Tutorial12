@@ -1,47 +1,44 @@
 @Tutorial12_HostAddress = http://localhost:5228
 
-### Get trips (default paging)
+### Get trips 
 GET {{Tutorial12_HostAddress}}/api/trips
 Accept: application/json
 
-###
-
-### Get trips (page 2, 5 items per page)
+### Get trips (page 2 and 5 items per page)
 GET {{Tutorial12_HostAddress}}/api/trips?page=2&pageSize=5
 Accept: application/json
 
-###
-
-### Register a new client to a trip (change trip ID)
-POST {{Tutorial12_HostAddress}}/api/trips/1/clients
+### Register a new client to a trip (204 No Content)
+POST {{Tutorial12_HostAddress}}/api/trips/2/clients
 Content-Type: application/json
 
 {
-  "FirstName": "Anna",
-  "LastName": "Kowalska",
-  "Email": "anna.kowalska@example.com",
+  "FirstName": "John",
+  "LastName": "Doe",
+  "Email": "john.doe@example.com",
   "Telephone": "+48 123 456 789",
-  "Pesel": "90120212345",
+  "Pesel":  "75820293919",
   "PaymentDate": "2025-07-01"
 }
 
-###
-
-### Register the SAME client again to the same trip (should fail)
-POST {{Tutorial12_HostAddress}}/api/trips/1/clients
+### Register the same client again to the same trip
+POST {{Tutorial12_HostAddress}}/api/trips/2/clients
 Content-Type: application/json
 
 {
-  "FirstName": "Anna",
-  "LastName": "Kowalska",
-  "Email": "anna.k@example.com",
-  "Telephone": "+48 999 999 999",
-  "Pesel": "90120212345",
+  "FirstName": "John",
+  "LastName": "Doe",
+  "Email": "john.doe@example.com",
+  "Telephone": "+48 123 456 789",
+  "Pesel":  "75820293919",
   "PaymentDate": "2025-07-01"
 }
 
-###
 
-### Delete a client (change ID)
+### Delete a client
+DELETE {{Tutorial12_HostAddress}}/api/clients/2
+Accept: application/json
+
+### Delete a client (404 Not Found)
 DELETE {{Tutorial12_HostAddress}}/api/clients/123
 Accept: application/json
