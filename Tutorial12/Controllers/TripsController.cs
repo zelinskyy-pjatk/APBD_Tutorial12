@@ -14,7 +14,7 @@ public class TripsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetTripsAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        if (page < 1) return BadRequest("Page must be  >= 1");
+        if (page < 1) return BadRequest("Page must be >= 1");
         if (pageSize < 1) return BadRequest("Page size must be >= 1");
         
         var result = await _tripService.GetTripsPageAsync(page, pageSize);

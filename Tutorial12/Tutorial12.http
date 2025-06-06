@@ -8,7 +8,7 @@ Accept: application/json
 GET {{Tutorial12_HostAddress}}/api/trips?page=2&pageSize=5
 Accept: application/json
 
-### Register a new client to a trip (204 No Content)
+### Register a new client (John) to a trip (204 No Content)
 POST {{Tutorial12_HostAddress}}/api/trips/2/clients
 Content-Type: application/json
 
@@ -21,7 +21,21 @@ Content-Type: application/json
   "PaymentDate": "2025-07-01"
 }
 
-### Register the same client again to the same trip
+### Register a new client (Mark) to a trip (204 No Content)
+POST {{Tutorial12_HostAddress}}/api/trips/2/clients
+Content-Type: application/json
+
+{
+  "FirstName": "Mark",
+  "LastName": "Mohn",
+  "Email": "mark.mohn@example.com",
+  "Telephone": "+48 542 243 423",
+  "Pesel":  "51876472831",
+  "PaymentDate": "2025-07-02"
+}
+
+
+### Register the same client again to the same trip (400 Bad Request)
 POST {{Tutorial12_HostAddress}}/api/trips/2/clients
 Content-Type: application/json
 
