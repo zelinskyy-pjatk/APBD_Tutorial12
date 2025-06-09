@@ -31,12 +31,17 @@ public class TripRepository : ITripRepository
                     t.DateTo,
                     t.MaxPeople,
                     t.IdCountries
-                        .Select(ct => new CountryDto(ct.Name))
+                        .Select(c => new CountryDto
+                        {
+                            Name = c.Name
+                        })
                         .ToList(), 
                     t.ClientTrips
-                            .Select(ct => new ClientDto(
-                                ct.IdClientNavigation.FirstName,
-                                ct.IdClientNavigation.LastName))
+                            .Select(ct => new ClientDto
+                            {
+                                FirstName = ct.IdClientNavigation.FirstName,
+                                LastName = ct.IdClientNavigation.LastName
+                            })
                         .ToList()))
             .ToListAsync();
         return (trips, total);

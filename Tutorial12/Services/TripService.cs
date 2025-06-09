@@ -18,19 +18,13 @@ public class TripService : ITripService
         var (trips, total) = await _tripRepository.GetTripsAsync(page, pageSize);
         var allPages = (int)Math.Ceiling(total / (double)pageSize);
 
-        return new TripPageDto(page, pageSize, allPages, trips);
-    }
-
-    public async Task DeleteClientAsync(int clientId)
-    {
-        var hasTrips = await _context.ClientTrips.AnyAsync(x => x.IdClient == clientId);
-        
-        if (hasTrips) throw new InvalidOperationException("Client is assigned to at least one trip.");
-        
-        var client = await _context.Clients.FindAsync(new object?[] {clientId}) ?? throw new KeyNotFoundException("Client was not found.");
-        
-        _context.Clients.Remove(client);
-        await _context.SaveChangesAsync();
+        return new TripPageDto()
+        {
+            PageNum = page, 
+            PageSize = pageSize, 
+            AllPages = allPages, 
+            Trips = trips
+        };
     }
 
     public async Task AssignClientAsync(int idTrip, AssignClientRequest assignClientRequest,
@@ -91,5 +85,17 @@ public class TripService : ITripService
             await transaction.RollbackAsync();
             throw;
         }
+    }
+    
+    public async Task DeleteClientAsync(int clientId)
+    {
+        var hasTrips = await _context.ClientTrips.AnyAsync(x => x.IdClient == clientId);
+        
+        if (hasTrips) throw new InvalidOperationException("Client is assigned to at least one trip.");
+        
+        var client = await _context.Clients.FindAsync(new object?[] {clientId}) ?? throw new KeyNotFoundException("Client was not found.");
+        
+        _context.Clients.Remove(client);
+        await _context.SaveChangesAsync();
     }
 }
