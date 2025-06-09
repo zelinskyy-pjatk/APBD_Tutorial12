@@ -7,15 +7,14 @@ namespace Tutorial12.Repositories;
 
 public class TripRepository : ITripRepository
 {
-    private readonly TravelDbContext _context;
-    public TripRepository(TravelDbContext context) => _context = context;
+    private readonly ApbdContext _context;
+    public TripRepository(ApbdContext context) => _context = context;
     
     public async Task<(List<TripDto> Trips, int Total)> GetTripsAsync(int page, int pageSize)
     {
         var baseQuery = _context.Trips
                 .AsNoTracking()
-                .Include(t => t.CountryTrips)
-                    .ThenInclude(tc => tc.Country)
+                .Include(t => t.IdCountries)
                 .Include(t => t.ClientTrips)
                     .ThenInclude(ct => ct.IdClientNavigation);
         
@@ -31,8 +30,8 @@ public class TripRepository : ITripRepository
                     t.DateFrom,
                     t.DateTo,
                     t.MaxPeople,
-                    t.CountryTrips
-                        .Select(ct => new CountryDto(ct.Country.Name))
+                    t.IdCountries
+                        .Select(ct => new CountryDto(ct.Name))
                         .ToList(), 
                     t.ClientTrips
                             .Select(ct => new ClientDto(

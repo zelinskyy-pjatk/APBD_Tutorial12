@@ -5,7 +5,7 @@ using Tutorial12.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<TravelDbContext>(
+builder.Services.AddDbContext<ApbdContext>(
     opt => 
         opt.UseSqlServer(
             builder.Configuration.GetConnectionString("Default")

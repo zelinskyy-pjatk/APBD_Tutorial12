@@ -9,7 +9,7 @@ GET {{Tutorial12_HostAddress}}/api/trips?page=2&pageSize=5
 Accept: application/json
 
 ### Register a new client (John) to a trip (204 No Content)
-POST {{Tutorial12_HostAddress}}/api/trips/2/clients
+POST {{Tutorial12_HostAddress}}/api/trips/1/clients
 Content-Type: application/json
 
 {
@@ -22,7 +22,7 @@ Content-Type: application/json
 }
 
 ### Register a new client (Mark) to a trip (204 No Content)
-POST {{Tutorial12_HostAddress}}/api/trips/2/clients
+POST {{Tutorial12_HostAddress}}/api/trips/1/clients
 Content-Type: application/json
 
 {

@@ -9,9 +9,9 @@ namespace Tutorial12.Services;
 public class TripService : ITripService
 {   
     private readonly ITripRepository _tripRepository;
-    private readonly TravelDbContext _context;
+    private readonly ApbdContext _context;
     
-    public TripService(ITripRepository tripRepository, TravelDbContext context) => (_tripRepository, _context) = (tripRepository, context);
+    public TripService(ITripRepository tripRepository, ApbdContext context) => (_tripRepository, _context) = (tripRepository, context);
     
     public async Task<TripPageDto> GetTripsPageAsync(int page, int pageSize)
     {
