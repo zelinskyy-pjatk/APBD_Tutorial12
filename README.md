@@ -12,7 +12,7 @@ Test Data to be inserted into database:
   INSERT INTO Country (Name) VALUES ('Germany');
   INSERT INTO Country (Name) VALUES ('Netherlands');
   
-  INSERT INTO Country_Trip (IdCountry, IdTrip) VALUES (1, 2);
+  INSERT INTO Country_Trip (IdCountry, IdTrip) VALUES (1, 1);
 
 
 Test Data to be received as a result of GET request:
