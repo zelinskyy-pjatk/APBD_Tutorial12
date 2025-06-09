@@ -50,7 +50,7 @@ Content-Type: application/json
 
 
 ### Delete a client
-DELETE {{Tutorial12_HostAddress}}/api/clients/2
+DELETE {{Tutorial12_HostAddress}}/api/clients/1
 Accept: application/json
 
 ### Delete a client (404 Not Found)

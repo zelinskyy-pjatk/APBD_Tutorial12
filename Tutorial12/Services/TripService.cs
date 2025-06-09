@@ -36,48 +36,60 @@ public class TripService : ITripService
     public async Task AssignClientAsync(int idTrip, AssignClientRequest assignClientRequest,
         DateTime now)
     {
-        var trip = await _context.Trips.Include(t => t.ClientTrips)
-            .SingleOrDefaultAsync(t => t.IdTrip == idTrip)
-            ?? throw new KeyNotFoundException("Trip was not found.");
+        using var transaction = await _context.Database.BeginTransactionAsync();
 
-        if (trip.DateFrom <= now)
-            throw new InvalidOperationException("Cannot register for a trip that has already started.");
-        
-        var client = await _context.Clients.SingleOrDefaultAsync(c => c.Pesel == assignClientRequest.Pesel);
-
-        if (client is null)
+        try
         {
-            client = new Client
+            var trip = await _context.Trips.Include(t => t.ClientTrips)
+                           .SingleOrDefaultAsync(t => t.IdTrip == idTrip)
+                       ?? throw new KeyNotFoundException("Trip was not found.");
+
+            if (trip.DateFrom <= now)
+                throw new InvalidOperationException("Cannot register for a trip that has already started.");
+
+            if (trip.ClientTrips.Count >= trip.MaxPeople)
+                throw new InvalidOperationException("Trip is already full.");
+
+            var client = await _context.Clients.SingleOrDefaultAsync(c => c.Pesel == assignClientRequest.Pesel);
+
+            if (client is null)
             {
-                FirstName = assignClientRequest.FirstName,
-                LastName = assignClientRequest.LastName,
-                Email = assignClientRequest.Email,
-                Telephone = assignClientRequest.Telephone,
-                Pesel = assignClientRequest.Pesel
-            };
-            _context.Clients.Add(client);
-            await _context.SaveChangesAsync();
-        } else
-        {
-            var isAlreadyOnTrip = await _context.ClientTrips.AnyAsync(ct => ct.IdTrip == idTrip &&
-                                                                            ct.IdClient == client.IdClient);
+                client = new Client
+                {
+                    FirstName = assignClientRequest.FirstName,
+                    LastName = assignClientRequest.LastName,
+                    Email = assignClientRequest.Email,
+                    Telephone = assignClientRequest.Telephone,
+                    Pesel = assignClientRequest.Pesel
+                };
+                _context.Clients.Add(client);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                var isAlreadyOnTrip = _context.ClientTrips.Any(ct => ct.IdClient == client.IdClient);
 
-            if (isAlreadyOnTrip)
-                throw new InvalidOperationException("Client already registered for this trip.");
+                if (isAlreadyOnTrip) throw new InvalidOperationException("Client already registered for this trip.");
+            }
+
+            var currentClientCount = await _context.ClientTrips.CountAsync(ct => ct.IdTrip == idTrip);
+            if (currentClientCount >= trip.MaxPeople)
+                throw new InvalidOperationException("Trip is already full.");
+
+            _context.ClientTrips.Add(new ClientTrip
+            {
+                IdTrip = idTrip,
+                IdClient = client.IdClient,
+                RegisteredAt = now,
+                PaymentDate = assignClientRequest.PaymentDate
+            });
+
+            await _context.SaveChangesAsync();
         }
-        
-        var currentClientCount = await _context.ClientTrips.CountAsync(ct => ct.IdTrip == idTrip);
-        if (currentClientCount >= trip.MaxPeople)
-            throw new InvalidOperationException("Trip is already full.");
-        
-        _context.ClientTrips.Add(new ClientTrip
+        catch
         {
-            IdTrip = idTrip,
-            IdClient = client.IdClient,
-            RegisteredAt = now,
-            PaymentDate = assignClientRequest.PaymentDate
-        });
-        
-        await _context.SaveChangesAsync();
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 }
